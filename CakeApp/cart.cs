@@ -1,0 +1,188 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+
+
+namespace _19cg026424_CakeApp
+{
+    public partial class cart : MaterialSkin.Controls.MaterialForm
+    {
+        public static int sum;
+        public DataTable Individual_cart()
+        {
+            string conn_method = "datasource=localhost; port=3306; username = root;password=''; database=cakeapp";
+            MySqlConnection conn = new MySqlConnection(conn_method);
+            string get_username = "SELECT `username` FROM `admin_users` WHERE username = '" + login.username + "'";
+            MySqlCommand cmd_get_username = new MySqlCommand(get_username, conn);
+            MySqlDataReader get_username_exe;
+            conn.Open();
+            get_username_exe = cmd_get_username.ExecuteReader();
+            get_username_exe.Read();
+
+            string username = get_username_exe.GetString(0);
+            get_username_exe.Close();
+            string get_coloumn = "SELECT id, `product`, `price`, `quantity` from " + username + " ";
+            MySqlCommand cmd_get_coloumn = new MySqlCommand(get_coloumn, conn);
+            MySqlDataAdapter sda = new MySqlDataAdapter(cmd_get_coloumn);
+
+            DataTable cart_table = new DataTable();
+            
+            
+            
+            sda.Fill(cart_table);
+
+            conn.Close();
+            return cart_table;
+        }
+
+        public void showTable()
+        {
+            dataGridView1.DataSource = Individual_cart();
+            dataGridView1.RowTemplate.Height = 50;
+            dataGridView1.ColumnHeadersHeight = 50;
+            dataGridView1.Columns[0].Width = 150;
+            dataGridView1.Columns[1].Width = 200;
+            dataGridView1.Columns[2].Width = 200;
+            dataGridView1.Columns[3].Width = 150;
+
+
+
+
+        }
+        public cart()
+        {
+            InitializeComponent();
+        }
+
+       
+
+        private void cart_Load(object sender, EventArgs e)
+        {
+             showTable();
+            string conn_method = "datasource=localhost; port=3306; username = root;password=''; database=cakeapp";
+            MySqlConnection conn = new MySqlConnection(conn_method);
+            string get_amount = "SELECT price, quantity FROM " + login.username + "";
+            MySqlCommand cmd_amount = new MySqlCommand(get_amount, conn);
+            MySqlDataReader reder;
+
+            try
+            {
+                conn.Open();
+                reder = cmd_amount.ExecuteReader();
+                sum = 0;
+                while (reder.Read())
+                {
+                    sum += (Convert.ToInt32(reder.GetString(0)) * Convert.ToInt32(reder.GetString(1)));
+                }
+                label2.Text = sum.ToString();
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        public static void truncate()
+        {
+
+            string conn_method = "datasource=localhost; port=3306; username = root;password=''; database=cakeapp";
+            MySqlConnection conn = new MySqlConnection(conn_method);
+            string truncate_query = "TRUNCATE `" + login.username + "`";
+            MySqlCommand cmd_truncate = new MySqlCommand(truncate_query, conn);
+            MySqlDataReader reader;
+            conn.Open();
+            reader = cmd_truncate.ExecuteReader();
+            reader.Read();
+            conn.Close();
+
+
+
+
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            string conn_method = "datasource=localhost; port=3306; username = root;password=''; database=cakeapp";
+            MySqlConnection conn = new MySqlConnection(conn_method);
+            string truncate_query = "TRUNCATE `"+login.username+"`";
+            MySqlCommand cmd_truncate = new MySqlCommand(truncate_query, conn);
+            MySqlDataReader reader;
+
+            try
+            {
+                conn.Open();
+                reader = cmd_truncate.ExecuteReader();
+                reader.Read();
+                this.Refresh();
+                showTable();
+                truncate();
+                conn.Close();
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+
+            string get_amount = "SELECT price, quantity FROM " + login.username + "";
+            MySqlCommand cmd_amount = new MySqlCommand(get_amount, conn);
+            MySqlDataReader reder;
+
+            try
+            {
+                conn.Open();
+                reder = cmd_amount.ExecuteReader();
+                sum = 0;
+                while (reder.Read())
+                {
+                    sum += (Convert.ToInt32(reder.GetString(0)) * Convert.ToInt32(reder.GetString(1)));
+                }
+                label2.Text = sum.ToString();
+                conn.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            payment pay = new payment();
+            pay.Show();
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            home one = new home();
+            one.Show();
+        }
+    }
+}
